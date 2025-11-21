@@ -1,0 +1,50 @@
+-- View All Sales records
+SELECT *
+FROM Bright_cars.sales;
+
+-- Handling Missing Values
+SELECT
+      COALESCE(make, 'unknown') AS make,
+     COALESCE( model, 'unknown') AS model,
+      COALESCE(body, 'unknown') AS body,
+     COALESCE( transmission, 'unknown') AS transmission,
+      COALESCE(state, 'unknown') AS state,
+     COALESCE(condition,0) AS condition,
+
+ --  Condition Classification
+CASE 
+      WHEN condition =0 THEN 'unknown'
+      WHEN condition BETWEEN 1 AND 15 THEN "poor"
+      WHEN condition BETWEEN 16 AND 30 THEN "Good"
+      WHEN condition >30 THEN 'Excellent'
+      END AS condition_level,
+-- color and interior classification
+      CASE
+      WHEN color IS NULL OR TRIM(color)='' OR color = '—' THEN 'Unknown'
+        ELSE color 
+    END AS color,
+      CASE
+    WHEN interior IS NULL OR TRIM(interior)='' OR interior = '—'THEN 'Unknown'
+        ELSE interior 
+    END AS interior,
+      COALESCE(seller,'unknown') AS seller,
+     COALESCE(mmr, 0) AS mmr,
+      sellingprice ,
+      (sellingprice-mmr) AS price_diff_mmr,
+       SUBSTR(saledate, 5, 3) AS sale_month,
+      SUBSTR(saledate, 12, 4) AS sale_year
+FROM Bright_cars.sales
+GROUP BY make,
+         model,
+         body,
+          transmission,
+          state,
+          condition,
+          sellingprice,
+          color,
+          interior,
+          (sellingprice-mmr),
+          seller,
+          mmr,
+           SUBSTR(saledate, 5, 3) ,
+      SUBSTR(saledate, 12, 4);
